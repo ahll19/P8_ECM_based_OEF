@@ -12,9 +12,7 @@ if __name__ == '__main__':
         "--instance_file", "-f",
         type=str,
         help="instance file in Excel format",
-        # default="instance/small case/IES_E9H12G7-v1.xlsx"
-        default="instance/case n-1/IES_E9H12G7.xlsx"
-        # default="instance/case n-1/IES_E118H376G150.xlsx"
+        default="instance/small case/IES_E9H12G7-v1.xlsx"
     )
     parser.add_argument(
         "--model_type", "-m",
@@ -36,7 +34,7 @@ if __name__ == '__main__':
         ies.optimize_lazy_explicit_uec_model()
 
     # do check and output
-    print(f"optimal operation cost is {ies.get_optimal_operation_cost()}.")
-    # plot_optimal_excitations(ies)
-    # plot_optimal_responses(ies)
-    # plot_ies_excitations_and_responses(ies)
+    print(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
+    plot_optimal_excitations(ies)
+    plot_optimal_responses(ies)
+    plot_ies_excitations_and_responses(ies)
