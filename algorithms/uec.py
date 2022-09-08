@@ -331,8 +331,6 @@ if __name__ == '__main__':
     instance_file = "../instance/small case/IES_E9H12G7-v1.xlsx"
     # instance_file = "../instance/small case/IES_E9H12G7-v2.xlsx"
     # instance_file = "../instance/large case/IES_E118H376G150.xlsx"
-    # model_type = "implicit"
-    # model_type = "explicit"
     model_type = "lazy_explicit"
 
     # parse input > model > optimize
@@ -350,26 +348,3 @@ if __name__ == '__main__':
     plot_ies_excitations_and_responses(ies)
     plot_optimal_excitations(ies)
     plot_optimal_responses(ies)
-
-    # ies = OptimalEnergyFlowUsingUEC(instance_file)
-    # m1 = ies.optimize_implicit_uec_model()
-    # ies = OptimalEnergyFlowUsingUEC(instance_file)
-    # m2 = ies.optimize_explicit_uec_model()
-    # ies = OptimalEnergyFlowUsingUEC(instance_file)
-    # m3 = ies.optimize_lazy_explicit_uec_model()
-    #
-    # from matplotlib import pyplot as plt
-    # plot_params = {"font.size": 20, "font.family": "Times New Roman", "mathtext.fontset": "stix"}
-    # plt.rcParams.update(plot_params)
-    # plt.figure("implicit", tight_layout=True, dpi=80)
-    # plt.spy(m1.getA(), ms=1)
-    # plt.title("variables", fontsize=20)
-    # plt.ylabel("constraints")
-    # plt.figure("explicit", tight_layout=True, dpi=80)
-    # plt.spy(m2.getA(), ms=1)
-    # plt.title("variables", fontsize=20)
-    # plt.ylabel("constraints")
-    # plt.figure("lazy explicit", tight_layout=True, dpi=80)
-    # plt.spy(m3.getA(), ms=1)
-    # plt.title("variables", fontsize=20)
-    # plt.ylabel("constraints")

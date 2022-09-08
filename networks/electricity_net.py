@@ -96,8 +96,7 @@ class ElectricityNetwork(BaseNet):
         return pre_contingency_line_flow  # (line_id, t)
 
     def get_post_contingency_line_flow(self, pre_contingency_line_flow, contingency_line_id):
-        return (pre_contingency_line_flow +
-                self.lodf[:, [contingency_line_id]] @ pre_contingency_line_flow[[contingency_line_id], :])
+        raise NotImplementedError()
 
     def security_check(self, reserved_each_t=3, epsilon=1e-3, contingency_limit_rate=1.2):
         pre_contingency_line_flow = self.get_pre_contingency_line_flow()
@@ -113,16 +112,7 @@ class ElectricityNetwork(BaseNet):
             violations[t].append((t, line_id, None, excess))
 
         # post-contingency power flow check
-        for cont_line in self.branches:
-            if not cont_line.consider_contingency:
-                continue
-            post_contingency_power_flow = self.get_post_contingency_line_flow(pre_contingency_line_flow, cont_line.id)
-            for line_id, t in zip(*np.where(abs(post_contingency_power_flow) >
-                                            line_thermal_limits * contingency_limit_rate)):
-                num_cont_violations += 1
-                excess = (abs(post_contingency_power_flow[line_id, t]) -
-                          line_thermal_limits[line_id, 0] * contingency_limit_rate)
-                violations[t].append((t, line_id, cont_line.id, excess))
+        # NotImplemented
 
         if num_normal_violations + num_cont_violations:
             warn(f"{num_normal_violations} pre-contingency and {num_cont_violations} post-contingency" +

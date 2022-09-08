@@ -205,21 +205,7 @@ class GasNetwork(BaseNet):
             violations_under_pressure[t].append((t, node_id, None, excess))
 
         # post-contingency pressure
-        # branch_flow = self.get_pipe_flow_curves()
-        base_branch_flow = self.get_pipe_flow_curves(return_base_value=True)
-        for cont_line in self.branches:
-            if not cont_line.consider_contingency:
-                continue
-            # post_cont_pressure = pre_cont_pressure[:-1] + (self.posf[cont_line.id] @ branch_flow[[cont_line.id]]).real
-            post_cont_pressure = pre_cont_pressure[:-1] + (self.posf[cont_line.id] @ base_branch_flow[[cont_line.id]]).real
-            for node_id, t in zip(*np.where(post_cont_pressure > upper_bound[:-1])):
-                num_total_over_pressure += 1
-                excess = post_cont_pressure[node_id, t] - upper_bound[node_id, 0]
-                violations_over_pressure[t].append((t, node_id, cont_line.id, excess))
-            for node_id, t in zip(*np.where(post_cont_pressure < lower_bound[:-1])):
-                num_total_under_pressure += 1
-                excess = lower_bound[node_id, 0] - post_cont_pressure[node_id, t]
-                violations_under_pressure[t].append((t, node_id, cont_line.id, excess))
+        # NotImplemented
 
         if num_total_over_pressure or num_total_under_pressure:
             warn(f"{num_total_over_pressure} over pressure and {num_total_under_pressure} under pressure detected " +
