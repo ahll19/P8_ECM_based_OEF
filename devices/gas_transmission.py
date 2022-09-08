@@ -110,9 +110,8 @@ class GasNode(BaseDevice):
         if cont_line_id is None:
             model.addLConstr(self.get_node_pressure(t, IDFT, Zs, fd_injections, pressure_refer_base) <= self.pMax)
         else:
-            model.addLConstr(
-                self.get_node_pressure(t, IDFT, Zs, fd_injections, pressure_refer_base) + delta_p <= self.pMax
-            )
+            # Not Implemented
+            pass
 
     def add_pressure_lower_bound_cons(self, model, t, IDFT, Zs, fd_injections, pressure_refer_base,
                                       cont_line_id=None, delta_p=None):
@@ -125,9 +124,8 @@ class GasNode(BaseDevice):
         if cont_line_id is None:
             model.addLConstr(self.get_node_pressure(t, IDFT, Zs, fd_injections, pressure_refer_base) >= self.pMin)
         else:
-            model.addLConstr(
-                self.get_node_pressure(t, IDFT, Zs, fd_injections, pressure_refer_base) + delta_p >= self.pMin
-            )
+            # Not Implemented
+            pass
 
     def get_node_pressure(self, t, IDFT=None, Zs=None, fd_injections=None, pressure_refer_base=None):
         if t not in self.pressure_expr:

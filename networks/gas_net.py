@@ -38,7 +38,6 @@ class GasNetwork(BaseNet):
                 self.Zs.append(adaptive_inv(Y[:-1, :-1]))
             else:
                 self.Zs.append(adaptive_inv(Y))
-        self.posf = self.get_posf()  # pipeline outage sensitivity factor
 
         self.pressure_reference_base = None
         self.implicit_model = False
@@ -47,23 +46,7 @@ class GasNetwork(BaseNet):
 
     def get_posf(self):
         # sensitivity factors from (branch flow on outage pipeline) to (node pressure)
-        posf = []
-        _, _, Zbs, Ubs = self.get_augmented_branch_freq_domain_lumped_params(self.branches, self.num_f, self.fr, True)
-        zb, kb = Zbs[0], Ubs[0]
-        for cont_line_id in range(self.num_branch):
-            branch = self.branches[cont_line_id]
-            zl = zb[cont_line_id]
-            kl = kb[cont_line_id]
-            if not branch.consider_contingency:
-                posf.append(None)
-            else:
-                M_fl = self.A[:-1, ::3][:, cont_line_id]
-                M_fl_plus = self.Af[:-1, ::3][:, cont_line_id]
-                eta_l = self.Zs[0] @ M_fl
-                eta_l_prime = (M_fl.T - kl * M_fl_plus.T) @ self.Zs[0]
-                c_l = 1 / (-zl + eta_l_prime @ M_fl)
-                posf.append((self.Zs[0] - eta_l @ c_l @ eta_l_prime) @ M_fl)
-        return posf
+        raise NotImplementedError()
 
     @staticmethod
     def get_augmented_incidence(pipes, num_node):
@@ -227,24 +210,8 @@ class GasNetwork(BaseNet):
     def get_delta_pressure_by_cont_line(self, node_id, cont_line_id):
         if cont_line_id is None:
             return 0
-
-        if cont_line_id not in self.branch_flow:
-            cont_line = self.branches[cont_line_id]
-            fm_nd = self.nodes[cont_line.from_node]
-            to_nd = self.nodes[cont_line.to_node]
-
-            fm_nd_pressure = fm_nd.get_node_pressure_f0(self.Zs[0], self.fd_node_injection[0],
-                                                        self.pressure_reference_base)
-            to_nd_pressure = to_nd.get_node_pressure_f0(self.Zs[0], self.fd_node_injection[0],
-                                                        self.pressure_reference_base)
-            _, _, Zbs, Ubs = self.get_augmented_branch_freq_domain_lumped_params(self.branches, self.num_f, self.fr,
-                                                                                 True)
-            zb = Zbs[0][cont_line.id].real
-            ub = Ubs[0][cont_line.id].real
-
-            self.branch_flow[cont_line_id] = (fm_nd_pressure - to_nd_pressure - ub * fm_nd_pressure) / (zb / 1e6)
-
-        return self.posf[cont_line_id][node_id, 0].real * self.branch_flow[cont_line_id]
+        else:
+            return NotImplementedError()
 
     def get_node_injection(self, fi):
         nodes = self.nodes

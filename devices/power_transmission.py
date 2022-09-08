@@ -99,16 +99,4 @@ class TransmissionLine(BaseDevice):
         model.addLConstr(self.get_power_flow(t) >= -self.maxP)
 
     def add_post_contingency_transmission_cons(self, model, t, buses, cont_line, lodf, contingency_limit_rate=1.2):
-        if (t, cont_line) in self.added_cons_post:
-            warn(f"post-cont security constraint of line{self.id} at t{t} is added for the second time.")
-            return
-
-        self.added_cons_post.add((t, cont_line))
-        power_flow_on_this_line = self.get_power_flow(t, buses)
-        power_flow_on_cont_line = cont_line.get_power_flow(t, buses)
-        model.addLConstr(
-            power_flow_on_this_line + power_flow_on_cont_line * lodf <= self.maxP * contingency_limit_rate
-        )
-        model.addLConstr(
-            -power_flow_on_this_line - power_flow_on_cont_line * lodf <= self.maxP * contingency_limit_rate
-        )
+        raise NotImplementedError()

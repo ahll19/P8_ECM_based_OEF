@@ -33,8 +33,6 @@ def read_transmission_line(line_table):
         lines[line_id]["x"] = line["x(p.u.)"]
         if not pd.isna(line["maxP(MW)"]):
             lines[line_id]["maxP"] = line["maxP(MW)"]
-        if "contingency" in line:
-            lines[line_id]["consider_contingency"] = line["contingency"]
 
     return lines
 
@@ -103,8 +101,6 @@ def read_gas_pipe(pipe_table):
         pipes[pipe_id]["area"] = np.pi * pipe["diameter(m)"] ** 2 / 4
         pipes[pipe_id]["friction"] = pipe["friction(dimensionless)"]
         pipes[pipe_id]["vBase"] = pipe["vBase(m/s)"]
-        if "contingency" in pipe:
-            pipes[pipe_id]["consider_contingency"] = pipe["contingency"]
 
     return pipes
 

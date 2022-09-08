@@ -245,11 +245,8 @@ class OptimalEnergyFlowUsingUEC:
                     e_net.branches[line_id].add_pre_contingency_transmission_cons(model, t, e_net.nodes)
                     print(" " * 4 + f"add pre-cont security cons of line-{line_id} at t-{t}: excess={excess:.3f}MW")
                 else:
-                    # violation with a contingency
-                    e_net.branches[line_id].add_post_contingency_transmission_cons(model, t, e_net.nodes,
-                                                                                   e_net.branches[cont_line_id],
-                                                                                   e_net.lodf[line_id, cont_line_id])
-                    print(" " * 4 + f"add post-cont security cons of line-{line_id} at t-{t}: excess={excess:.3f}MW")
+                    # Not Implemented
+                    pass
             # security constraints for gas net
             for t, node_id, cont_line_id, excess in over_pressure:
                 t += g_net.num_th
@@ -300,8 +297,8 @@ class OptimalEnergyFlowUsingUEC:
 
     @timer("IES security check")
     def security_check(self, reserved_each_t=3):
-        over_flow = self.e_net.security_check(reserved_each_t)  # consider n-1 contingencies: done
-        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t)  # consider n-1 contingencies: todo
+        over_flow = self.e_net.security_check(reserved_each_t)
+        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t)
         over_temperature, under_temperature = self.h_net.security_check(reserved_each_t)
         return over_flow, over_pressure, under_pressure, over_temperature, under_temperature
 
@@ -344,7 +341,7 @@ if __name__ == '__main__':
 
     # output
     ies.security_check()
-    info(f"optimal operation cost is {ies.get_optimal_operation_cost()}.")
+    info(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
     plot_ies_excitations_and_responses(ies)
     plot_optimal_excitations(ies)
     plot_optimal_responses(ies)

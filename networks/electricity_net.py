@@ -53,14 +53,7 @@ class ElectricityNetwork(BaseNet):
                 line.add_pre_contingency_transmission_cons(model, t, self.nodes)
 
         # n-1 contingencies
-        for t in range(self.num_tx):
-            for line in self.branches:
-                for cont_line in self.branches:
-                    if line is cont_line:
-                        continue
-                    line.add_post_contingency_transmission_cons(
-                        model, t, self.nodes, cont_line, self.lodf[line.id, cont_line.id]
-                    )
+        # Not Implemented
 
     def get_available_wind_power(self):
         available_wind = np.zeros(self.num_tx)
