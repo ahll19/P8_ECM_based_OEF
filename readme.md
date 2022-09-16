@@ -31,7 +31,7 @@ This is the code repository of the article ["An Efficient Optimal Energy Flow Mo
 ## TODO List
 
 - [x] Code cleaning and commenting.
-- [ ] A document about input file structure, script arguments, involved classes and functions, etc.
+- [ ] A document about the input file structure, script arguments, involved classes and functions, etc.
 - [ ] Support more functions, e.g. considering N-1 contingency.
 
 
