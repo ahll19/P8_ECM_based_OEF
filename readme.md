@@ -6,11 +6,11 @@ This is the code repository of the article ["An Efficient Optimal Energy Flow Mo
 
 ## Quick Start
 
-1. Install [Gurobi](https://www.gurobi.com/) (a license is required) and [Anaconda](https://www.anaconda.com/) (Not necessary but recommended).
+1. Install [Gurobi](https://www.gurobi.com/) (a license is required) and [Anaconda](https://www.anaconda.com/) (not necessary but recommended).
 
 2. Prepare a Python environment: 
 
-   Clone this repo to your local disk, and open a terminal/cmd in its root directory. Enter the following codes.
+   Clone this repo to your local disk, and open a terminal/cmd in its root directory to enter the following codes.
 
    ```cmd
    conda create -n ecm_oef python=3.8
