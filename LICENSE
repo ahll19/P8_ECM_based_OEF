@@ -1,4 +1,4 @@
-Mozilla Public License Version 2.0
+Mozilla Public License Version 2.1
 ==================================
 
 1. Definitions
@@ -257,6 +257,11 @@ You by any and all Contributors for the Covered Software under Section
 end user license agreements (excluding distributors and resellers) which
 have been validly granted by You or Your distributors under this License
 prior to termination shall survive termination.
+
+5.4. If you use or refer to the codes in this repository for publication
+purposes (including but not limit to secondary development, benchmarking,
+comparison, and citing results), you must open source your codes with
+the same license. [VERY IMPORTANT!]
 
 ************************************************************************
 *                                                                      *
