@@ -1,0 +1,428 @@
+{
+    "elapsed_time_sec": 6.633362054824829,
+    "files": {
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/algorithms/uec.py": {
+            "functions": [
+                {
+                    "line": "OptimalEnergyFlowUsingUEC.optimize_lazy_explicit_uec_model",
+                    "lineno": 159,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 65.38964292055182,
+                    "n_cpu_percent_python": 4.145171652381552,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 4,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.6164766828435841,
+                    "n_usage_fraction": 0.0
+                }
+            ],
+            "leaks": {},
+            "lines": [
+                {
+                    "line": "        model = Model()\n",
+                    "lineno": 174,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.809735240409072,
+                    "n_cpu_percent_python": 0.08534533903286579,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.0,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "            model.optimize()\n",
+                    "lineno": 224,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 64.57509409082081,
+                    "n_cpu_percent_python": 4.059826313348686,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 4,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.6212902721655267,
+                    "n_usage_fraction": 0.0
+                }
+            ],
+            "percent_cpu_time": 71.61825388301024
+        },
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/devices/base_device.py": {
+            "functions": [
+                {
+                    "line": "GasWell.add_ift_cons",
+                    "lineno": 16,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 5.580029184287312,
+                    "n_cpu_percent_python": 2.3259266721976473,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 2,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.07161863154008687,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "ThermalPowerUnit.fix_to_zero",
+                    "lineno": 40,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.3290745582429238,
+                    "n_cpu_percent_python": 0.04267266951643289,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.0,
+                    "n_usage_fraction": 0.0
+                }
+            ],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 8.349321715784404
+        },
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/devices/gas_transmission.py": {
+            "functions": [
+                {
+                    "line": "GasNode.add_pressure_upper_bound_cons",
+                    "lineno": 110,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.03809940526712288,
+                    "n_cpu_percent_python": 0.0416114081117522,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.0020329523468064024,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "GasNode.add_pressure_lower_bound_cons",
+                    "lineno": 124,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.034722156796508565,
+                    "n_cpu_percent_python": 0.16927315927606892,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 1,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.0017082873313922309,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "GasNode.get_node_pressure",
+                    "lineno": 138,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.17482423142190995,
+                    "n_cpu_percent_python": 0.7588955205697243,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 2,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.011334790720996529,
+                    "n_usage_fraction": 0.0
+                }
+            ],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 1.2325019118422817
+        },
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/devices/heat_transmission.py": {
+            "functions": [
+                {
+                    "line": "HeatPipe.__init__",
+                    "lineno": 20,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.007500115301019048,
+                    "n_cpu_percent_python": 0.038422721828991764,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.005079537476029619,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "HeatPipe.add_vars",
+                    "lineno": 63,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.0,
+                    "n_cpu_percent_python": 0.0,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 1,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.0,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "HeatPipe.add_temperature_upper_bound_cons",
+                    "lineno": 118,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.020582298183878626,
+                    "n_cpu_percent_python": 0.16867279806496957,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 4,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.002264111807855004,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "HeatPipe.add_temperature_lower_bound_cons",
+                    "lineno": 126,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.04164111270374327,
+                    "n_cpu_percent_python": 0.21212996792534572,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 1,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.0014754920834522587,
+                    "n_usage_fraction": 0.0
+                },
+                {
+                    "line": "HeatPipe.get_pipe_end_temperature",
+                    "lineno": 134,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.4466747633664901,
+                    "n_cpu_percent_python": 2.961108542768371,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 4,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.029897079240315677,
+                    "n_usage_fraction": 0.0
+                }
+            ],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 3.935448540750461
+        },
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/networks/electricity_net.py": {
+            "functions": [],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 3.312077649920503
+        },
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/read/read_instance.py": {
+            "functions": [
+                {
+                    "line": "OptimalEnergyFlowUsingUEC.read_instance",
+                    "lineno": 15,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.11301206397618883,
+                    "n_cpu_percent_python": 0.5875065250589238,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 1,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.16446068932993546,
+                    "n_usage_fraction": 0.0
+                }
+            ],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 5.012724349959761
+        },
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/utils/ft.py": {
+            "functions": [
+                {
+                    "line": "OptimalEnergyFlowUsingUEC.get_IDFT_matrix",
+                    "lineno": 107,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.0066091042794942136,
+                    "n_cpu_percent_python": 0.0391071259141726,
+                    "n_gpu_avg_memory_mb": 0.0,
+                    "n_gpu_peak_memory_mb": 0.0,
+                    "n_gpu_percent": 0,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 0.004168120471042201,
+                    "n_usage_fraction": 0.0
+                }
+            ],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 2.7053405656680534
+        },
+        "/Users/jakobolsen/Documents/4_uni/8_semester/p8/python/P8/ECM_based_OEF/visualize/ies_plot.py": {
+            "functions": [],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 1.3036628555278769
+        },
+        "demo_usage.py": {
+            "functions": [],
+            "leaks": {},
+            "lines": [],
+            "percent_cpu_time": 0.0
+        }
+    },
+    "gpu": false,
+    "growth_rate": 20.61574458046579,
+    "max_footprint_fname": "demo_usage.py",
+    "max_footprint_lineno": 34,
+    "max_footprint_mb": 138.69337272644043,
+    "memory": true,
+    "program": "demo_usage.py",
+    "samples": [
+        [
+            2029504000,
+            68.85233045351112
+        ],
+        [
+            2556357750,
+            106.54051427387674
+        ],
+        [
+            2556772291,
+            83.67885335031188
+        ],
+        [
+            2674921333,
+            106.48367884929499
+        ],
+        [
+            3076221500,
+            84.02435704196814
+        ],
+        [
+            3709033833,
+            122.48053147620213
+        ],
+        [
+            3709559583,
+            94.07216819016571
+        ],
+        [
+            3811076875,
+            118.60720228370499
+        ],
+        [
+            4279684625,
+            94.40105777736701
+        ],
+        [
+            4538232958,
+            126.61905663278392
+        ],
+        [
+            4538769791,
+            97.46927106182038
+        ],
+        [
+            4685925083,
+            126.19226958961893
+        ],
+        [
+            5511206166,
+            97.81687784874462
+        ],
+        [
+            5599289875,
+            126.65532304151854
+        ],
+        [
+            5599720041,
+            97.55030268689185
+        ],
+        [
+            5774780541,
+            126.37260320819598
+        ],
+        [
+            6622252458,
+            97.91811714388616
+        ]
+    ]
+}

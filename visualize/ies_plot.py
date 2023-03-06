@@ -1,9 +1,10 @@
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
-
+from pickle import dump
 
 def plot_ies_excitations_and_responses(ies):
+    axes = []
     plot_params = {"font.size": 15, "font.family": "Times New Roman", "mathtext.fontset": "stix"}
 
     fig = plt.figure("excitations and responses in IES", tight_layout=True, figsize=(10, 12), dpi=80)
@@ -31,12 +32,15 @@ def plot_ies_excitations_and_responses(ies):
     ax1.set_xticklabels(["00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00"])
     ax1.legend(fontsize=15, loc="lower left")
 
+    axes.append([ies.e_net.get_total_load(),[curves,labels]])
     # sub-figure2: responses in the electricity network
     ax2 = fig.add_subplot(gs[0, 1])
     ax2.set_title("(d) transmission line power")
     line_flow = ies.e_net.get_pre_contingency_line_flow()
+    ax2_temp = []
     for line in ies.e_net.branches:
         plt.plot(line_flow[line.id], label=f"line {line.from_node + 1}-{line.to_node + 1}")
+        ax2_temp.append(line_flow[line.id])
     ax2.set_ylabel("electric power (MW)")
     ax2.set_xlim([0, ies.num_tx - 1])
     # ax2.set_ylim([0, 270])  # modify when necessary
@@ -44,6 +48,8 @@ def plot_ies_excitations_and_responses(ies):
     ax2.set_xticklabels(["00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00"])
     if ies.e_net.num_branch <= 12:
         ax2.legend(fontsize=12, loc="upper left")
+
+    axes.append(ax2_temp)
 
     # sub-figure3: excitations in the natural gas network
     ax3 = fig.add_subplot(gs[1, 0])
@@ -62,13 +68,17 @@ def plot_ies_excitations_and_responses(ies):
     ax3.set_xticklabels(["00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00"])
     if len(ies.gas_wells) <= 12:
         ax3.legend(fontsize=15, loc="lower left")
+    
+    axes.append([ies.g_net.get_total_load(),[curves,labels]])
 
     # sub-figure4: responses in the natural gas network
     ax4 = fig.add_subplot(gs[1, 1])
     ax4.set_title("(e) node pressure")
     node_pressure = ies.g_net.get_pressure_curves()
+    ax4_temp = []
     for nd_id in range(ies.g_net.num_node):
         plt.plot(node_pressure[nd_id], label=f"node {nd_id + 1}")
+        ax4_temp.append(node_pressure[nd_id])
     ax4.set_ylabel("pressure (MPa)")
     ax4.set_xlim([0, ies.num_tx - 1])
     # ax4.set_ylim([0, 270])  # modify when necessary
@@ -76,6 +86,8 @@ def plot_ies_excitations_and_responses(ies):
     ax4.set_xticklabels(["00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00"])
     if ies.e_net.num_branch <= 12:
         ax4.legend(fontsize=12, loc="lower left")
+
+    axes.append(ax4_temp)
 
     # sub-figure5: excitations in the heating network
     ax5 = fig.add_subplot(gs[2, 0])
@@ -97,12 +109,16 @@ def plot_ies_excitations_and_responses(ies):
     ax5.set_xticklabels(["00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00"])
     ax5.legend(fontsize=15, loc="lower left")
 
+    axes.append([ies.h_net.get_total_load(),[curves,labels]])
+
     # sub-figure6: responses in the heating network
     ax6 = fig.add_subplot(gs[2, 1])
     ax6.set_title("(f) node temperature")
     node_temperature = ies.h_net.get_node_temperature_curves()
+    ax6_temp = []
     for nd_id in range(ies.h_net.num_node):
         plt.plot(node_temperature[nd_id], label=f"node {nd_id + 1}")
+        ax6_temp.append(node_temperature[nd_id])
     ax6.set_ylabel("temperature ($^{\circ}$C)")
     ax6.set_xlim([0, ies.num_tx - 1])
     # ax6.set_ylim([0, 270])  # modify when necessary
@@ -110,7 +126,12 @@ def plot_ies_excitations_and_responses(ies):
     ax6.set_xticklabels(["00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "24:00"])
     if ies.h_net.num_node <= 12:
         ax6.legend(fontsize=12, loc="lower left")
+    
+    axes.append(ax6_temp)
+    # with open('../ecm_oef_playground/fig/axes.pkl', 'wb') as f:
+    #     dump(axes, f)
 
+    # plt.savefig('../ecm_oef_playground/fig/fig.pdf')
     plt.show()
 
 

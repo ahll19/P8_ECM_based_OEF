@@ -39,6 +39,14 @@ class HeatPipe(BaseDevice):
         self.gas_boilers = []
         if self.has_load:
             self.load_fd = td2fd(np.hstack((self.load_his, self.load)))
+            # self.load_fd[np.abs(self.load_fd) < 5] = 0
+            # with open("../ecm_oef_playground/freq_heat_high.npy", "wb") as f:
+            #     np.save(f, self.load_fd)
+            #     print("saved")
+            # with open("../ecm_oef_playground/time_heat_high.npy", "wb") as f:
+            #     np.save(f, np.hstack((self.load_his, self.load)))
+            #     print("saved")
+
         self.end_temperature_expr = {}  # key: time
         self.prod_ZI = {}  # key: frequency
         self.added_ub_cons = set()
