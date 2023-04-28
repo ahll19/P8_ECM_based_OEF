@@ -11,15 +11,24 @@ from networks.electricity_net import ElectricityNetwork
 
 
 class OptimalEnergyFlowUsingUEC:
-    def __init__(self, instance_file):
+    def __init__(self, instance_file, cut_off: int=None):
         # read instance file
         (buses, lines, heat_nodes, heat_pipes, gas_nodes, gas_pipes,
          TPUs, gTPUs, CHPs, gCHPs, heat_pumps, gas_boilers, gas_wells) = read_instance(instance_file)
+        self.cut_off = cut_off
+        if cut_off is not None:
+            for i in range(len(heat_pipes)):
+                if heat_pipes[i].has_load:
+                    heat_pipes[i].load_fd = heat_pipes[i].load_fd[:cut_off]
+
+            for i in range(len(gas_nodes)):
+                if gas_nodes[i].has_load:
+                    gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cut_off]
 
         # construct `network` instances
-        e_net = ElectricityNetwork(buses, lines)
-        g_net = GasNetwork(gas_nodes, gas_pipes)
-        h_net = HeatingNetwork(heat_nodes, heat_pipes)
+        e_net = ElectricityNetwork(buses, lines, cut_off=cut_off)
+        g_net = GasNetwork(gas_nodes, gas_pipes, cut_off=cut_off)
+        h_net = HeatingNetwork(heat_nodes, heat_pipes, cut_off=cut_off)
 
         # check
         assert e_net.num_tx == g_net.num_tx and e_net.num_tx == h_net.num_tx, "inconsistent boundary condition."

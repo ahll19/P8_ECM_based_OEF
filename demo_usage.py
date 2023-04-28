@@ -3,9 +3,12 @@ from algorithms.uec import OptimalEnergyFlowUsingUEC
 from visualize.ies_plot import plot_optimal_responses
 from visualize.ies_plot import plot_optimal_excitations
 from visualize.ies_plot import plot_ies_excitations_and_responses
+import matplotlib as mpl
 
 
 if __name__ == '__main__':
+    mpl.use("TkAgg")
+
     # do arguments parse
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -19,6 +22,12 @@ if __name__ == '__main__':
         type=str,
         help="model type: implicit, explicit, and lazy_explicit",
         default="lazy_explicit"
+    )
+    parser.add_argument(
+        "--cut_off", "-c",
+        type=int,
+        help="cutoff value for frequency",
+        default=None
     )
     args = parser.parse_args()
 
@@ -35,6 +44,8 @@ if __name__ == '__main__':
 
     # do check and output
     print(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
-    plot_optimal_excitations(ies)
-    plot_optimal_responses(ies)
+    # plot_optimal_excitations(ies)
+    # plot_optimal_responses(ies)
     plot_ies_excitations_and_responses(ies)
+
+    print("Done")
