@@ -18,12 +18,6 @@ if __name__ == '__main__':
         default="instance/small case/IES_E9H12G7-v1.xlsx"
     )
     parser.add_argument(
-        "--model_type", "-m",
-        type=str,
-        help="model type: implicit, explicit, and lazy_explicit",
-        default="lazy_explicit"
-    )
-    parser.add_argument(
         "--cut_off", "-c",
         type=int,
         help="cutoff value for frequency",
@@ -32,15 +26,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # do information reading
-    ies = OptimalEnergyFlowUsingUEC(args.instance_file)
-
-    # do modeling and optimization
-    if args.model_type == "implicit":
-        ies.optimize_implicit_uec_model()
-    elif args.model_type == "explicit":
-        ies.optimize_explicit_uec_model()
-    elif args.model_type == "lazy_explicit":
-        ies.optimize_lazy_explicit_uec_model()
+    ies = OptimalEnergyFlowUsingUEC(args.instance_file, args.cut_off)
+    ies.optimize_lazy_explicit_uec_model()
 
     # do check and output
     print(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
