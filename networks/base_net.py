@@ -3,7 +3,7 @@ from scipy import sparse
 
 
 class BaseNet(object):
-    def __init__(self, nodes, branches, interval):
+    def __init__(self, nodes, branches, interval, cut_off: int=None):
         self.nodes = nodes
         self.branches = branches
         self.num_node = len(nodes)
@@ -24,7 +24,10 @@ class BaseNet(object):
         self.tx = np.linspace(self.num_th, self.num_th + self.num_tx - 1, self.num_tx) * interval + interval
         self.tl = interval * (self.num_th + self.num_tx)  # time length
         self.fr = 1 / self.tl  # frequency resolution
-        self.num_f = 1 + (self.num_th + self.num_tx) // 2
+        if cut_off is None:
+            self.num_f = 1 + (self.num_th + self.num_tx) // 2
+        else:
+            self.num_f = cut_off
 
     @staticmethod
     def get_Af(A):

@@ -10,28 +10,25 @@ from networks.heating_net import HeatingNetwork
 from networks.electricity_net import ElectricityNetwork
 
 
-class OptimalEnergyFlowUsingUEC:
-    def __init__(self, instance_file):
+class OptimalEnergyFlowUsingUEC2:
+    def __init__(self, instance_file, cut_off: int=None):
         # read instance file
         (buses, lines, heat_nodes, heat_pipes, gas_nodes, gas_pipes,
          TPUs, gTPUs, CHPs, gCHPs, heat_pumps, gas_boilers, gas_wells) = read_instance(instance_file)
-        # cutoff = 50
-        # for i in range(len(heat_pipes)):
-        #     if heat_pipes[i].has_load:
-        #         heat_pipes[i].load_fd = heat_pipes[i].load_fd[:cutoff]
-        #         # heat_pipes[i].load = fd2td(heat_pipes[i].load_fd)
-        #         # heat_pipes[i].load_his = heat_pipes[i].load.copy()
-        
-        # for i in range(len(gas_nodes)):
-        #     if gas_nodes[i].has_load:
-        #         gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cutoff]
-        #         # gas_nodes[i].load = fd2td(gas_nodes[i].load_fd)
-        #         # gas_nodes[i].load_his = gas_nodes[i].load.copy()
+        self.cut_off = cut_off
+        if cut_off is not None:
+            for i in range(len(heat_pipes)):
+                if heat_pipes[i].has_load:
+                    heat_pipes[i].load_fd = heat_pipes[i].load_fd[:cut_off]
+
+            for i in range(len(gas_nodes)):
+                if gas_nodes[i].has_load:
+                    gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cut_off]
 
         # construct `network` instances
-        e_net = ElectricityNetwork(buses, lines)
-        g_net = GasNetwork(gas_nodes, gas_pipes)
-        h_net = HeatingNetwork(heat_nodes, heat_pipes)
+        e_net = ElectricityNetwork(buses, lines, cut_off=cut_off)
+        g_net = GasNetwork(gas_nodes, gas_pipes, cut_off=cut_off)
+        h_net = HeatingNetwork(heat_nodes, heat_pipes, cut_off=cut_off)
 
         # check
         assert e_net.num_tx == g_net.num_tx and e_net.num_tx == h_net.num_tx, "inconsistent boundary condition."
@@ -57,126 +54,6 @@ class OptimalEnergyFlowUsingUEC:
         self.all_nets = [self.e_net, self.g_net, self.h_net]
         self.model = None
 
-    @timer("optimizing the implicit uec model")
-    def optimize_implicit_uec_model(self, improve_numeric_condition=True):
-        # implicit modeling means we introduce both excitation vars and response vars and use the following
-        # constraints to connect them:
-        # 1. FT cons for td and fd excitation vars (both history and future)
-        # 2. "YU=I" cons for fd excitation vars and fd response vars
-        # 3. FT cons for td and fd response vars (only future, since we cannot change the history)
-        #
-        # make it more clear:
-        # excitation vars: device schedules, including gas production/consumption, heat production/consumption
-        # response vars: network states, including network pressure, network temperature
-        #
-        # one more thing, for electricity networks, we always adopt explicit modeling.
-        tick = time.time()
-        model = Model()
-        if improve_numeric_condition:
-            model.setParam("NumericFocus", 3)
-        all_devices = self.all_devices
-        all_nets = self.all_nets
-
-        # decision variables
-        for device in all_devices:
-            device.add_vars(model, self.num_tx, self.num_f)
-        for net in all_nets:
-            net.add_vars(model)
-
-        # constraints
-        # (1) device: max/min production [done when created variables]
-        # (2) device: frequency-domain variables' freedom degree limit [done when created variables]
-        # (3) device: max up/down ramp
-        for device in all_devices:
-            device.add_ramp_cons(model)
-        # (4) device: coupling characteristics
-        for device in all_devices:
-            device.add_coupling_cons(model)
-        # (5) system: supply-demand balance
-        for net in all_nets:
-            net.add_system_balance_cons(model)
-        # (6) device & system: time domain-frequency domain conversion
-        for device in all_devices:
-            device.add_fd2td_cons(model)  # FT cons for td and fd excitation vars
-        for net in all_nets:
-            net.add_fd2td_cons(model)  # FT cons for td and fd response vars
-        # (7) system: network equation
-        for net in all_nets:
-            net.add_network_cons(model)  # "YU=I" cons
-
-        # objective
-        model.setObjective(
-            quicksum(device.get_cost_expr() for device in all_devices) +
-            quicksum(device.get_high_freq_penalty(rho=5e-3) for device in all_devices)
-        )
-
-        model.optimize()
-        solving_time = model.runTime
-        modeling_time = time.time() - tick - solving_time
-        info(f"modeling runs for {modeling_time:.2f}s, and solving runs for {solving_time:.2f}s.")
-        self.model = model
-        return model
-
-    @timer("optimizing the explicit uec model")
-    def optimize_explicit_uec_model(self, improve_numeric_condition=True):
-        # explicit modeling means that we introduce only excitation vars and represent response vars as
-        # expressions about excitation vars. Thus, constraints include
-        # 1. FT cons for td and fd excitation vars (both history and future)
-        # 2. linear expressions of response vars about excitation vars
-        tick = time.time()
-        model = Model()
-        if improve_numeric_condition:
-            model.setParam("NumericFocus", 3)
-        all_devices = self.all_devices
-        all_nets = self.all_nets
-
-        # decision variables
-        for device in all_devices:
-            device.add_vars(model, self.num_tx, self.num_f)
-        for net in all_nets:
-            net.add_vars(model, implicit=False)
-
-        # constraints
-        # (1) device: max/min production [done when created variables]
-        # (2) device: frequency-domain variables' freedom degree limit [done when created variables]
-        # (3) device: max up/down ramp
-        for device in all_devices:
-            device.add_ramp_cons(model)                  # pure time-domain
-        # (4) device: coupling characteristics
-        for device in all_devices:
-            device.add_coupling_cons(model)              # pure time-domain
-        # (5) system: supply-demand balance
-        for net in all_nets:
-            net.add_system_balance_cons(model)           # pure time-domain
-        # (6) device & system: time domain-frequency domain conversion
-        for device in all_devices:
-            device.add_fd2td_cons(model)  # excitation transformation in both history and future
-        # (7) system: network equation
-        for net in all_nets:
-            net.add_network_cons(model, implicit=False)  # "U=ZI" cons
-
-        # objective
-        model.setObjective(
-            quicksum(device.get_cost_expr() for device in all_devices) +
-            quicksum(device.get_high_freq_penalty(rho=5e-3) for device in all_devices)
-        )
-
-        model.optimize()
-        solving_time = model.runTime
-        modeling_time = time.time() - tick - solving_time
-        info(f"modeling runs for {modeling_time:.2f}s, and solving runs for {solving_time:.2f}s.")
-        self.model = model
-        return model
-
-    @timer("optimizing the explicit uec model with lazy implementation")
-    def optimize_lazy_explicit_uec_modelv2(self, improve_numeric_condition=True, reserved_violations_each_t=1,
-                                         lp_torlence=1e-8):
-        # we modify optimize_lazy_explicit_uec_model to be able to cut off
-        # the frequency domain to only using the highest frequencies
-        modeling_time = solving_time = security_check_time = 0
-        num_security_cons_in_e_net = num_security_cons_in_g_net = num_security_cons_in_h_net = 0
-        tick1 = time.time()
-
     @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,
                                          lp_torlence=1e-8):
@@ -199,6 +76,8 @@ class OptimalEnergyFlowUsingUEC:
         e_net = self.e_net
         h_net = self.h_net
         g_net = self.g_net
+
+        print("Pause")
 
         # decision variables
         for device in all_devices:
@@ -338,31 +217,3 @@ class OptimalEnergyFlowUsingUEC:
                 prod_heat[i] += np.asarray(gen.get_optimal_heat_production())
         return prod_heat
 
-
-if __name__ == '__main__':
-    # unit test
-    from visualize.ies_plot import plot_ies_excitations_and_responses
-    from visualize.ies_plot import plot_optimal_excitations
-    from visualize.ies_plot import plot_optimal_responses
-
-    # input
-    instance_file = "../instance/small case/IES_E9H12G7-v1.xlsx"
-    # instance_file = "../instance/small case/IES_E9H12G7-v2.xlsx"
-    # instance_file = "../instance/large case/IES_E118H376G150.xlsx"
-    model_type = "lazy_explicit"
-
-    # parse input > model > optimize
-    ies = OptimalEnergyFlowUsingUEC(instance_file)
-    if model_type == "implicit":
-        model = ies.optimize_implicit_uec_model()
-    elif model_type == "explicit":
-        model = ies.optimize_explicit_uec_model()
-    elif model_type == "lazy_explicit":
-        model = ies.optimize_lazy_explicit_uec_model()
-
-    # output
-    ies.security_check()
-    info(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
-    plot_ies_excitations_and_responses(ies)
-    plot_optimal_excitations(ies)
-    plot_optimal_responses(ies)

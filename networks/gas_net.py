@@ -12,7 +12,7 @@ from utils.console_log import info, warn
 
 class GasNetwork(BaseNet):
     @timer("initializing the gas network")
-    def __init__(self, nodes, branches, interval=900):
+    def __init__(self, nodes, branches, interval=900, cut_off: int=None):
         def adaptive_inv(mat):
             if mat.shape[0] > 1000:
                 return inv(mat.tocsc()).A
@@ -20,7 +20,7 @@ class GasNetwork(BaseNet):
                 return np.linalg.inv(mat.A)  # quicker for small-scale Y
 
         # common attributes
-        super().__init__(nodes, branches, interval)
+        super().__init__(nodes, branches, interval, cut_off)
 
         # specialized attributes
         self.num_augmented_node = self.num_node + 1  # one more `ground node`

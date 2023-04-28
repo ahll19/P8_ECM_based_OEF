@@ -12,7 +12,7 @@ if __name__ == '__main__':
         "--instance_file", "-f",
         type=str,
         help="instance file in Excel format",
-        default="instance/small case/IES_E9H12G7-v1.xlsx"
+        default="instance/small case/IES_E9H12G7-v2.xlsx"
     )
     parser.add_argument(
         "--model_type", "-m",
@@ -35,6 +35,8 @@ if __name__ == '__main__':
 
     # do check and output
     print(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
-    plot_optimal_excitations(ies)
-    plot_optimal_responses(ies)
+    # plot_optimal_excitations(ies)
+    # plot_optimal_responses(ies)
     plot_ies_excitations_and_responses(ies)
+
+    print("Done")
