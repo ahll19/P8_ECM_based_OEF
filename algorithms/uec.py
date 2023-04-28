@@ -2,7 +2,7 @@ import time
 import numpy as np
 from utils.timer import timer
 from utils.console_log import info
-from utils.ft import get_IDFT_matrix
+from utils.ft import get_IDFT_matrix, fd2td
 from networks.gas_net import GasNetwork
 from gurobipy import Model, GRB, quicksum
 from read.read_instance import read_instance
@@ -15,6 +15,18 @@ class OptimalEnergyFlowUsingUEC:
         # read instance file
         (buses, lines, heat_nodes, heat_pipes, gas_nodes, gas_pipes,
          TPUs, gTPUs, CHPs, gCHPs, heat_pumps, gas_boilers, gas_wells) = read_instance(instance_file)
+        # cutoff = 50
+        # for i in range(len(heat_pipes)):
+        #     if heat_pipes[i].has_load:
+        #         heat_pipes[i].load_fd = heat_pipes[i].load_fd[:cutoff]
+        #         # heat_pipes[i].load = fd2td(heat_pipes[i].load_fd)
+        #         # heat_pipes[i].load_his = heat_pipes[i].load.copy()
+        
+        # for i in range(len(gas_nodes)):
+        #     if gas_nodes[i].has_load:
+        #         gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cutoff]
+        #         # gas_nodes[i].load = fd2td(gas_nodes[i].load_fd)
+        #         # gas_nodes[i].load_his = gas_nodes[i].load.copy()
 
         # construct `network` instances
         e_net = ElectricityNetwork(buses, lines)
@@ -157,6 +169,16 @@ class OptimalEnergyFlowUsingUEC:
         return model
 
     @timer("optimizing the explicit uec model with lazy implementation")
+    def optimize_lazy_explicit_uec_modelv2(self, improve_numeric_condition=True, reserved_violations_each_t=1,
+                                         lp_torlence=1e-8):
+        # we modify optimize_lazy_explicit_uec_model to be able to cut off
+        # the frequency domain to only using the highest frequencies
+        modeling_time = solving_time = security_check_time = 0
+        num_security_cons_in_e_net = num_security_cons_in_g_net = num_security_cons_in_h_net = 0
+        tick1 = time.time()
+
+
+    @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,
                                          lp_torlence=1e-8):
         # we first relax all security constraints of three energy networks, and then add them when violated
@@ -297,9 +319,9 @@ class OptimalEnergyFlowUsingUEC:
 
     @timer("IES security check")
     def security_check(self, reserved_each_t=3):
-        over_flow = self.e_net.security_check(reserved_each_t)
-        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t)
-        over_temperature, under_temperature = self.h_net.security_check(reserved_each_t)
+        over_flow = self.e_net.security_check(reserved_each_t, epsilon=1.5)
+        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t, epsilon=1.5)
+        over_temperature, under_temperature = self.h_net.security_check(reserved_each_t, epsilon=3)
         return over_flow, over_pressure, under_pressure, over_temperature, under_temperature
 
     def get_power_production(self):
