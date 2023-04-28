@@ -56,7 +56,7 @@ class OptimalEnergyFlowUsingUEC:
 
     @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,
-                                         lp_torlence=1e-8):
+                                         lp_torlence=1e-8, maxiter=20):
         # we first relax all security constraints of three energy networks, and then add them when violated
         # the involved `security constraints` include
         # (1) power flow limits of transmission lines in electricity networks
@@ -114,7 +114,8 @@ class OptimalEnergyFlowUsingUEC:
         g_net.fd_node_injection = [g_net.get_node_injection(fi) for fi in range(self.num_f)]
         h_net.fd_pipe_injection = [h_net.get_pipe_injection(fi) for fi in range(self.num_f)]
         num_security_cons_in_h_net += h_net.add_source_security_cons(model)  # pre-calculation trick
-        while True:
+        for ijk in range(maxiter):
+            # TODO: Add method for checking if last violations are the same as current ones
             # solve the optimization
             iteration += 1
             model.setParam("BarConvTol", lp_torlence)

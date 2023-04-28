@@ -23,11 +23,17 @@ if __name__ == '__main__':
         help="cutoff value for frequency",
         default=None
     )
+    parser.add_argument(
+        "--maxiter", "-m",
+        type=int,
+        help="maximum iteration number",
+        default=20
+    )
     args = parser.parse_args()
 
     # do information reading
     ies = OptimalEnergyFlowUsingUEC(args.instance_file, args.cut_off)
-    ies.optimize_lazy_explicit_uec_model()
+    ies.optimize_lazy_explicit_uec_model(maxiter=args.maxiter)
 
     # do check and output
     print(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
