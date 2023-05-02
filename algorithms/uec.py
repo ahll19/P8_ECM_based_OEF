@@ -54,6 +54,11 @@ class OptimalEnergyFlowUsingUEC:
         self.all_nets = [self.e_net, self.g_net, self.h_net]
         self.model = None
 
+    @timer("Nu skal det satme gå stærkt Bobby")
+    def optimize_lazy_explicit_uec_model2(self, improve_numeric_condition=True, reserved_violations_each_t=1,
+                                         lp_torlence=1e-8, maxiter=20):
+        pass
+
     @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,
                                          lp_torlence=1e-8, maxiter=20):
@@ -119,6 +124,7 @@ class OptimalEnergyFlowUsingUEC:
             # solve the optimization
             iteration += 1
             model.setParam("BarConvTol", lp_torlence)
+            model.addVar(vtype=GRB.INTEGER, name="maxiter", obj=maxiter)
             model.optimize()
             solving_time += model.runTime
 
