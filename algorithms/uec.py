@@ -190,7 +190,8 @@ class OptimalEnergyFlowUsingUEC:
         info(f"add {num_security_cons_in_h_net}(max.{h_net.num_branch * h_net.num_tx * 2}) security cons of " +
              f"heating network.")
         self.model = model
-        return model, modeling_time
+        # TODO: make sure time is not fake :)
+        return model, modeling_time + solving_time + security_check_time
 
     def get_optimal_operation_cost(self):
         return quicksum(device.get_cost_expr() for device in self.all_devices).getValue()
