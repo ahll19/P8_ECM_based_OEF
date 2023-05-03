@@ -47,6 +47,12 @@ class GasNode(BaseDevice):
         #     with open("../ecm_oef_playground/time_gas_high.npy", "wb") as f:
         #         np.save(f, np.hstack((self.load_his, self.load)))
         #         print("saved")
+
+        if load_fd.__len__() != num_f:
+            z = np.zeros(num_f, dtype=complex)
+            z[:load_fd.__len__()] = load_fd
+            load_fd = z
+
         self.net_injection_re = [LinExpr(-load_fd[fi].real) for fi in range(num_f)]
         self.net_injection_im = [LinExpr(-load_fd[fi].imag) for fi in range(num_f)]
 

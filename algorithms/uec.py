@@ -26,9 +26,9 @@ class OptimalEnergyFlowUsingUEC:
                     gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cut_off]
 
         # construct `network` instances
-        e_net = ElectricityNetwork(buses, lines, cut_off=cut_off)
-        g_net = GasNetwork(gas_nodes, gas_pipes, cut_off=cut_off)
-        h_net = HeatingNetwork(heat_nodes, heat_pipes, cut_off=cut_off)
+        e_net = ElectricityNetwork(buses, lines,)
+        g_net = GasNetwork(gas_nodes, gas_pipes,)
+        h_net = HeatingNetwork(heat_nodes, heat_pipes,)
 
         # check
         assert e_net.num_tx == g_net.num_tx and e_net.num_tx == h_net.num_tx, "inconsistent boundary condition."
@@ -54,14 +54,9 @@ class OptimalEnergyFlowUsingUEC:
         self.all_nets = [self.e_net, self.g_net, self.h_net]
         self.model = None
 
-    @timer("Nu skal det satme gå stærkt Bobby")
-    def optimize_lazy_explicit_uec_model2(self, improve_numeric_condition=True, reserved_violations_each_t=1,
-                                         lp_torlence=1e-8, maxiter=20):
-        pass
-
     @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,
-                                         lp_torlence=1e-8, maxiter=20):
+                                         lp_torlence=1e-8, maxiter=20, epsilon=1e-3):
         # we first relax all security constraints of three energy networks, and then add them when violated
         # the involved `security constraints` include
         # (1) power flow limits of transmission lines in electricity networks
@@ -130,7 +125,7 @@ class OptimalEnergyFlowUsingUEC:
 
             # do security check
             tick2 = time.time()
-            violations = self.security_check(reserved_violations_each_t)
+            violations = self.security_check(reserved_violations_each_t, epsilon=epsilon)
             if sum(map(len, violations)) == 0:
                 info(f"iteration-{iteration}: no more violations. End iterations.")
                 security_check_time += time.time() - tick2
@@ -195,16 +190,16 @@ class OptimalEnergyFlowUsingUEC:
         info(f"add {num_security_cons_in_h_net}(max.{h_net.num_branch * h_net.num_tx * 2}) security cons of " +
              f"heating network.")
         self.model = model
-        return model
+        return model, modeling_time
 
     def get_optimal_operation_cost(self):
         return quicksum(device.get_cost_expr() for device in self.all_devices).getValue()
 
     @timer("IES security check")
-    def security_check(self, reserved_each_t=3):
-        over_flow = self.e_net.security_check(reserved_each_t)
-        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t)
-        over_temperature, under_temperature = self.h_net.security_check(reserved_each_t)
+    def security_check(self, reserved_each_t=3, epsilon=1e-3):
+        over_flow = self.e_net.security_check(reserved_each_t, epsilon)
+        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t, epsilon)
+        over_temperature, under_temperature = self.h_net.security_check(reserved_each_t, epsilon)
         return over_flow, over_pressure, under_pressure, over_temperature, under_temperature
 
     def get_power_production(self):

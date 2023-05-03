@@ -66,6 +66,12 @@ class HeatPipe(BaseDevice):
         load = self.load if self.has_load else np.zeros(num_t)
         self.net_injection = [LinExpr(-load[t]) for t in range(num_t)]
         load_fd = self.load_fd if self.has_load else np.zeros(num_f, dtype=complex)
+
+        if load_fd.__len__() != num_f:
+            z = np.zeros(num_f, dtype=complex)
+            z[:load_fd.__len__()] = load_fd
+            load_fd = z
+
         self.net_injection_re = [LinExpr(-load_fd[fi].real) for fi in range(num_f)]
         self.net_injection_im = [LinExpr(-load_fd[fi].imag) for fi in range(num_f)]
 

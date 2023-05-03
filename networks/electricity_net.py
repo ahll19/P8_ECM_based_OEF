@@ -14,9 +14,9 @@ import numpy as np
 
 class ElectricityNetwork(BaseNet):
     @timer("initializing the electricity network")
-    def __init__(self, nodes, branches, interval=900, cut_off: int=None):
+    def __init__(self, nodes, branches, interval=900):
         # common attributes
-        super().__init__(nodes, branches, interval, cut_off)
+        super().__init__(nodes, branches, interval)
 
         # specialized attributes
         # A matrix is reduced, in which the last bus is regarded as the reference bus

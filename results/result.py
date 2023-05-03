@@ -1,48 +1,60 @@
 from pickle import dump, load
 import numpy as np
 
+
 class Result:
     power_network = None
     gas_network = None
     heat_network = None
     optimal_cost = None
+    lp_tolerance = None
+    max_iter = None
 
-    def __init__(self, ies = None, path: str = None) -> None:
-        if ies is not None:
+    def __init__(
+            self, ies=None, path: str = None, description: str = None
+    ) -> None:
+        done = False
+        if ies is not None and not done:
             self.__set_params(ies)
-            return None
-        if path is not None:
+            if description is not None:
+                self.description = description
+
+            done = True
+        if path is not None and not done:
             self.load(path)
-            return None
-        
-        raise Exception("Either ies or path should be set.")
-    
+            done = True
+
+        if not done:
+            raise Exception("Either ies or path should be set.")
+
     def save(self, path):
         if self.model is None:
             raise Exception("Model is not set.")
-        
+
         save_obj = [
             self.power_network,
             self.gas_network,
             self.heat_network,
             self.optimal_cost,
             self.lp_tolerance,
-            self.max_iter
+            self.max_iter,
+            self.description
         ]
 
         with open(path, 'wb') as f:
             dump(save_obj, f)
-    
+
     def load(self, path):
         with open(path, 'rb') as f:
             save_obj = load(f)
-        
+
         self.power_network = save_obj[0]
         self.gas_network = save_obj[1]
         self.heat_network = save_obj[2]
         self.optimal_cost = save_obj[3]
         self.lp_tolerance = save_obj[4]
         self.max_iter = save_obj[5]
+        self.description = save_obj[6]
 
     def __set_params(self, ies):
         # electricty network (MW)
@@ -57,7 +69,7 @@ class Result:
             "chp": p_chp,
             "gchp": p_gchp,
             "load": load,
-            "transmission line flow" : {
+            "transmission line flow": {
                 f"{line.from_node + 1}-{line.to_node + 1}": line_flow[line.id]
                 for line in ies.e_net.branches
             }
@@ -65,13 +77,13 @@ class Result:
 
         # gas network (kg/s)
         gas_production = {
-            gas_well.id + 1 : np.array(gas_well.get_optimal_production())
+            gas_well.id + 1: np.array(gas_well.get_optimal_production())
             for gas_well in ies.gas_wells
         }
         gas_load = ies.g_net.get_total_load()
         node_pressure = ies.g_net.get_pressure_curves()
         gas_response = {
-            nd_id + 1 : node_pressure[nd_id]
+            nd_id + 1: node_pressure[nd_id]
             for nd_id in range(ies.g_net.num_node)
         }
 
@@ -86,7 +98,7 @@ class Result:
         heat_load = ies.g_net.get_total_load()
         node_temperature = ies.h_net.get_node_temperature_curves()
         node_temperatures = {
-            nd_id + 1 : node_temperature[nd_id]
+            nd_id + 1: node_temperature[nd_id]
             for nd_id in range(ies.h_net.num_node)
         }
 
