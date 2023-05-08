@@ -8,6 +8,7 @@ from gurobipy import Model, GRB, quicksum
 from read.read_instance import read_instance
 from networks.heating_net import HeatingNetwork
 from networks.electricity_net import ElectricityNetwork
+from scipy import sparse
 
 
 class OptimalEnergyFlowUsingUEC:
@@ -15,18 +16,20 @@ class OptimalEnergyFlowUsingUEC:
         # read instance file
         (buses, lines, heat_nodes, heat_pipes, gas_nodes, gas_pipes,
          TPUs, gTPUs, CHPs, gCHPs, heat_pumps, gas_boilers, gas_wells) = read_instance(instance_file)
-        # cutoff = 50
-        # for i in range(len(heat_pipes)):
-        #     if heat_pipes[i].has_load:
-        #         heat_pipes[i].load_fd = heat_pipes[i].load_fd[:cutoff]
-        #         # heat_pipes[i].load = fd2td(heat_pipes[i].load_fd)
-        #         # heat_pipes[i].load_his = heat_pipes[i].load.copy()
+        cutoff = 50
+        for i in range(len(heat_pipes)):
+            if heat_pipes[i].has_load:
+                heat_pipes[i].load_fd[cutoff:] = 0
+
+                heat_pipes[i].load_fd = sparse.csr_matrix(heat_pipes[i].load_fd)
+                
         
-        # for i in range(len(gas_nodes)):
-        #     if gas_nodes[i].has_load:
-        #         gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cutoff]
-        #         # gas_nodes[i].load = fd2td(gas_nodes[i].load_fd)
-        #         # gas_nodes[i].load_his = gas_nodes[i].load.copy()
+        for i in range(len(gas_nodes)):
+            if gas_nodes[i].has_load:
+                gas_nodes[i].load_fd[cutoff:] = 0
+
+                gas_nodes[i].load_fd = sparse.csr_matrix(gas_nodes[i].load_fd)
+                
 
         # construct `network` instances
         e_net = ElectricityNetwork(buses, lines)
@@ -167,16 +170,6 @@ class OptimalEnergyFlowUsingUEC:
         info(f"modeling runs for {modeling_time:.2f}s, and solving runs for {solving_time:.2f}s.")
         self.model = model
         return model
-
-    @timer("optimizing the explicit uec model with lazy implementation")
-    def optimize_lazy_explicit_uec_modelv2(self, improve_numeric_condition=True, reserved_violations_each_t=1,
-                                         lp_torlence=1e-8):
-        # we modify optimize_lazy_explicit_uec_model to be able to cut off
-        # the frequency domain to only using the highest frequencies
-        modeling_time = solving_time = security_check_time = 0
-        num_security_cons_in_e_net = num_security_cons_in_g_net = num_security_cons_in_h_net = 0
-        tick1 = time.time()
-
 
     @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,

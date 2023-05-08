@@ -38,3 +38,4 @@ if __name__ == '__main__':
     plot_optimal_excitations(ies)
     plot_optimal_responses(ies)
     plot_ies_excitations_and_responses(ies)
+    print('hej')
