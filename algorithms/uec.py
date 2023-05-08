@@ -16,14 +16,23 @@ class OptimalEnergyFlowUsingUEC:
         (buses, lines, heat_nodes, heat_pipes, gas_nodes, gas_pipes,
          TPUs, gTPUs, CHPs, gCHPs, heat_pumps, gas_boilers, gas_wells) = read_instance(instance_file)
         self.cut_off = cut_off
+
+        self.heat_energy_diffs = []
+        self.gas_energy_diffs = []
         if cut_off is not None:
             for i in range(len(heat_pipes)):
                 if heat_pipes[i].has_load:
+                    energy_before = np.sum(np.abs(heat_pipes[i].load_fd)**2)
                     heat_pipes[i].load_fd = heat_pipes[i].load_fd[:cut_off]
+                    energy_after = np.sum(np.abs(heat_pipes[i].load_fd)**2)
+                    self.heat_energy_diffs.append((energy_before, energy_after))
 
             for i in range(len(gas_nodes)):
                 if gas_nodes[i].has_load:
+                    energy_before = np.sum(np.abs(gas_nodes[i].load_fd)**2)
                     gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cut_off]
+                    energy_after = np.sum(np.abs(gas_nodes[i].load_fd)**2)
+                    self.gas_energy_diffs.append((energy_before, energy_after))
 
         # construct `network` instances
         e_net = ElectricityNetwork(buses, lines,)
@@ -53,6 +62,9 @@ class OptimalEnergyFlowUsingUEC:
         self.all_devices += self.heat_pumps + self.gas_boilers + self.gas_wells
         self.all_nets = [self.e_net, self.g_net, self.h_net]
         self.model = None
+
+    def get_energy_diffs(self):
+        return self.heat_energy_diffs, self.gas_energy_diffs
 
     @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,
@@ -191,7 +203,7 @@ class OptimalEnergyFlowUsingUEC:
              f"heating network.")
         self.model = model
         # TODO: make sure time is not fake :)
-        return model, modeling_time + solving_time + security_check_time
+        return model, modeling_time + solving_time + security_check_time, iteration
 
     def get_optimal_operation_cost(self):
         return quicksum(device.get_cost_expr() for device in self.all_devices).getValue()

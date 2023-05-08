@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     # do information reading
     ies = OptimalEnergyFlowUsingUEC(args.instance_file, args.cut_off)
-    model, time = ies.optimize_lazy_explicit_uec_model(maxiter=args.maxiter, lp_torlence=args.lp_tolerance)
+    model, time, iteration_count = ies.optimize_lazy_explicit_uec_model(maxiter=args.maxiter, lp_torlence=args.lp_tolerance)
 
     # do check and output
     print(f"optimal operation cost is {ies.get_optimal_operation_cost():.2f}.")
@@ -59,7 +59,8 @@ if __name__ == '__main__':
                       f"LP tolerance: {args.lp_tolerance}\n" \
                       f"modeling time: {time:.2f} seconds\n" \
                       f"Epsilon: {args.epsilon}\n" \
-                      f"optimal operation cost: {ies.get_optimal_operation_cost():.2f}"
+                      f"optimal operation cost: {ies.get_optimal_operation_cost():.2f}\n" \
+                      f"iteration count: {iteration_count}"
     save_name = f"{args.instance_file.split('/')[-1].split('.')[0]}/{args.cut_off}_{args.maxiter}_{args.lp_tolerance}_{args.epsilon}"
     result = Result(ies, description=description_str)
     result.save(f"results/runs/{save_name}.pkl")

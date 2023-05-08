@@ -9,6 +9,8 @@ class Result:
     optimal_cost = None
     lp_tolerance = None
     max_iter = None
+    heat_energy_diff = None
+    gas_energy_diff = None
 
     def __init__(
             self, ies=None, path: str = None, description: str = None
@@ -38,7 +40,9 @@ class Result:
             self.optimal_cost,
             self.lp_tolerance,
             self.max_iter,
-            self.description
+            self.description,
+            self.heat_energy_diff,
+            self.gas_energy_diff
         ]
 
         with open(path, 'wb') as f:
@@ -55,6 +59,8 @@ class Result:
         self.lp_tolerance = save_obj[4]
         self.max_iter = save_obj[5]
         self.description = save_obj[6]
+        self.heat_energy_diff = save_obj[7]
+        self.gas_energy_diff = save_obj[8]
 
     def __set_params(self, ies):
         # electricty network (MW)
@@ -110,6 +116,9 @@ class Result:
             "heat load": heat_load,
             "node temperatures": node_temperatures
         }
+
+        # energy difference
+        self.heat_energy_diff, self.gas_energy_diff = ies.get_energy_diffs()
 
         self.optimal_cost = ies.get_optimal_operation_cost()
         self.lp_tolerance = ies.model.params.BarConvTol

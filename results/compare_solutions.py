@@ -18,7 +18,7 @@ class Comparer:
     diff_gas_l1: dict = None
     diff_heat_l1: dict = None
     
-    def __init__(self, results: List[Result], main_idx: int) -> None:
+    def __init__(self, results: List[Result], main_idx: int = 0) -> None:
         if len(results) != 2:
             raise Exception(
                 "Only two results can be compared. This is because this module" + 
@@ -194,7 +194,6 @@ class Comparer:
         ax6.legend()
         
         fig.show()
-        print("woohoo")
     
     def summary(self,) -> List[str]:
         avg_trans_pow = np.mean([
