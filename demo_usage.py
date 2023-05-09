@@ -16,7 +16,7 @@ if __name__ == '__main__':
         "--instance_file", "-f",
         type=str,
         help="instance file in Excel format",
-        default="instance/small case/v3.xlsx"
+        default="instance/small case/IES_E9H12G7-v1.xlsx"
     )
     parser.add_argument(
         "--cut_off", "-c",
