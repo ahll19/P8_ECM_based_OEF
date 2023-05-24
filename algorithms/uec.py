@@ -11,15 +11,33 @@ from networks.electricity_net import ElectricityNetwork
 
 
 class OptimalEnergyFlowUsingUEC:
-    def __init__(self, instance_file):
+    def __init__(self, instance_file, cut_off: int=None):
         # read instance file
         (buses, lines, heat_nodes, heat_pipes, gas_nodes, gas_pipes,
          TPUs, gTPUs, CHPs, gCHPs, heat_pumps, gas_boilers, gas_wells) = read_instance(instance_file)
+        self.cut_off = cut_off
+
+        self.heat_energy_diffs = []
+        self.gas_energy_diffs = []
+        if cut_off is not None:
+            for i in range(len(heat_pipes)):
+                if heat_pipes[i].has_load:
+                    energy_before = np.sum(np.abs(heat_pipes[i].load_fd)**2)
+                    heat_pipes[i].load_fd = heat_pipes[i].load_fd[:cut_off]
+                    energy_after = np.sum(np.abs(heat_pipes[i].load_fd)**2)
+                    self.heat_energy_diffs.append((energy_before, energy_after))
+
+            for i in range(len(gas_nodes)):
+                if gas_nodes[i].has_load:
+                    energy_before = np.sum(np.abs(gas_nodes[i].load_fd)**2)
+                    gas_nodes[i].load_fd = gas_nodes[i].load_fd[:cut_off]
+                    energy_after = np.sum(np.abs(gas_nodes[i].load_fd)**2)
+                    self.gas_energy_diffs.append((energy_before, energy_after))
 
         # construct `network` instances
-        e_net = ElectricityNetwork(buses, lines)
-        g_net = GasNetwork(gas_nodes, gas_pipes)
-        h_net = HeatingNetwork(heat_nodes, heat_pipes)
+        e_net = ElectricityNetwork(buses, lines,)
+        g_net = GasNetwork(gas_nodes, gas_pipes,)
+        h_net = HeatingNetwork(heat_nodes, heat_pipes,)
 
         # check
         assert e_net.num_tx == g_net.num_tx and e_net.num_tx == h_net.num_tx, "inconsistent boundary condition."
@@ -45,120 +63,12 @@ class OptimalEnergyFlowUsingUEC:
         self.all_nets = [self.e_net, self.g_net, self.h_net]
         self.model = None
 
-    @timer("optimizing the implicit uec model")
-    def optimize_implicit_uec_model(self, improve_numeric_condition=True):
-        # implicit modeling means we introduce both excitation vars and response vars and use the following
-        # constraints to connect them:
-        # 1. FT cons for td and fd excitation vars (both history and future)
-        # 2. "YU=I" cons for fd excitation vars and fd response vars
-        # 3. FT cons for td and fd response vars (only future, since we cannot change the history)
-        #
-        # make it more clear:
-        # excitation vars: device schedules, including gas production/consumption, heat production/consumption
-        # response vars: network states, including network pressure, network temperature
-        #
-        # one more thing, for electricity networks, we always adopt explicit modeling.
-        tick = time.time()
-        model = Model()
-        if improve_numeric_condition:
-            model.setParam("NumericFocus", 3)
-        all_devices = self.all_devices
-        all_nets = self.all_nets
-
-        # decision variables
-        for device in all_devices:
-            device.add_vars(model, self.num_tx, self.num_f)
-        for net in all_nets:
-            net.add_vars(model)
-
-        # constraints
-        # (1) device: max/min production [done when created variables]
-        # (2) device: frequency-domain variables' freedom degree limit [done when created variables]
-        # (3) device: max up/down ramp
-        for device in all_devices:
-            device.add_ramp_cons(model)
-        # (4) device: coupling characteristics
-        for device in all_devices:
-            device.add_coupling_cons(model)
-        # (5) system: supply-demand balance
-        for net in all_nets:
-            net.add_system_balance_cons(model)
-        # (6) device & system: time domain-frequency domain conversion
-        for device in all_devices:
-            device.add_fd2td_cons(model)  # FT cons for td and fd excitation vars
-        for net in all_nets:
-            net.add_fd2td_cons(model)  # FT cons for td and fd response vars
-        # (7) system: network equation
-        for net in all_nets:
-            net.add_network_cons(model)  # "YU=I" cons
-
-        # objective
-        model.setObjective(
-            quicksum(device.get_cost_expr() for device in all_devices) +
-            quicksum(device.get_high_freq_penalty(rho=5e-3) for device in all_devices)
-        )
-
-        model.optimize()
-        solving_time = model.runTime
-        modeling_time = time.time() - tick - solving_time
-        info(f"modeling runs for {modeling_time:.2f}s, and solving runs for {solving_time:.2f}s.")
-        self.model = model
-        return model
-
-    @timer("optimizing the explicit uec model")
-    def optimize_explicit_uec_model(self, improve_numeric_condition=True):
-        # explicit modeling means that we introduce only excitation vars and represent response vars as
-        # expressions about excitation vars. Thus, constraints include
-        # 1. FT cons for td and fd excitation vars (both history and future)
-        # 2. linear expressions of response vars about excitation vars
-        tick = time.time()
-        model = Model()
-        if improve_numeric_condition:
-            model.setParam("NumericFocus", 3)
-        all_devices = self.all_devices
-        all_nets = self.all_nets
-
-        # decision variables
-        for device in all_devices:
-            device.add_vars(model, self.num_tx, self.num_f)
-        for net in all_nets:
-            net.add_vars(model, implicit=False)
-
-        # constraints
-        # (1) device: max/min production [done when created variables]
-        # (2) device: frequency-domain variables' freedom degree limit [done when created variables]
-        # (3) device: max up/down ramp
-        for device in all_devices:
-            device.add_ramp_cons(model)                  # pure time-domain
-        # (4) device: coupling characteristics
-        for device in all_devices:
-            device.add_coupling_cons(model)              # pure time-domain
-        # (5) system: supply-demand balance
-        for net in all_nets:
-            net.add_system_balance_cons(model)           # pure time-domain
-        # (6) device & system: time domain-frequency domain conversion
-        for device in all_devices:
-            device.add_fd2td_cons(model)  # excitation transformation in both history and future
-        # (7) system: network equation
-        for net in all_nets:
-            net.add_network_cons(model, implicit=False)  # "U=ZI" cons
-
-        # objective
-        model.setObjective(
-            quicksum(device.get_cost_expr() for device in all_devices) +
-            quicksum(device.get_high_freq_penalty(rho=5e-3) for device in all_devices)
-        )
-
-        model.optimize()
-        solving_time = model.runTime
-        modeling_time = time.time() - tick - solving_time
-        info(f"modeling runs for {modeling_time:.2f}s, and solving runs for {solving_time:.2f}s.")
-        self.model = model
-        return model
+    def get_energy_diffs(self):
+        return self.heat_energy_diffs, self.gas_energy_diffs
 
     @timer("optimizing the explicit uec model with lazy implementation")
     def optimize_lazy_explicit_uec_model(self, improve_numeric_condition=True, reserved_violations_each_t=1,
-                                         lp_torlence=1e-8):
+                                         lp_torlence=1e-8, maxiter=20, epsilon=1e-3):
         # we first relax all security constraints of three energy networks, and then add them when violated
         # the involved `security constraints` include
         # (1) power flow limits of transmission lines in electricity networks
@@ -216,16 +126,18 @@ class OptimalEnergyFlowUsingUEC:
         g_net.fd_node_injection = [g_net.get_node_injection(fi) for fi in range(self.num_f)]
         h_net.fd_pipe_injection = [h_net.get_pipe_injection(fi) for fi in range(self.num_f)]
         num_security_cons_in_h_net += h_net.add_source_security_cons(model)  # pre-calculation trick
-        while True:
+        for ijk in range(maxiter):
+            # TODO: Add method for checking if last violations are the same as current ones
             # solve the optimization
             iteration += 1
             model.setParam("BarConvTol", lp_torlence)
+            model.addVar(vtype=GRB.INTEGER, name="maxiter", obj=maxiter)
             model.optimize()
             solving_time += model.runTime
 
             # do security check
             tick2 = time.time()
-            violations = self.security_check(reserved_violations_each_t)
+            violations = self.security_check(reserved_violations_each_t, epsilon=epsilon)
             if sum(map(len, violations)) == 0:
                 info(f"iteration-{iteration}: no more violations. End iterations.")
                 security_check_time += time.time() - tick2
@@ -290,16 +202,17 @@ class OptimalEnergyFlowUsingUEC:
         info(f"add {num_security_cons_in_h_net}(max.{h_net.num_branch * h_net.num_tx * 2}) security cons of " +
              f"heating network.")
         self.model = model
-        return model
+        # TODO: make sure time is not fake :)
+        return model, modeling_time + solving_time + security_check_time, iteration
 
     def get_optimal_operation_cost(self):
         return quicksum(device.get_cost_expr() for device in self.all_devices).getValue()
 
     @timer("IES security check")
-    def security_check(self, reserved_each_t=3):
-        over_flow = self.e_net.security_check(reserved_each_t)
-        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t)
-        over_temperature, under_temperature = self.h_net.security_check(reserved_each_t)
+    def security_check(self, reserved_each_t=3, epsilon=1e-3):
+        over_flow = self.e_net.security_check(reserved_each_t, epsilon)
+        over_pressure, under_pressure = self.g_net.security_check(reserved_each_t, epsilon)
+        over_temperature, under_temperature = self.h_net.security_check(reserved_each_t, epsilon)
         return over_flow, over_pressure, under_pressure, over_temperature, under_temperature
 
     def get_power_production(self):

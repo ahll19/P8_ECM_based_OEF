@@ -12,7 +12,7 @@ from utils.console_log import info, warn
 
 class HeatingNetwork(BaseNet):
     @timer("initializing the heating network")
-    def __init__(self, nodes, branches, interval=900):
+    def __init__(self, nodes, branches, interval=900,):
         # common attributes
         super().__init__(nodes, branches, interval)
 
