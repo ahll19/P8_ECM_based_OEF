@@ -2,12 +2,13 @@ import time
 import numpy as np
 from utils.timer import timer
 from utils.console_log import info
-from utils.ft import get_IDFT_matrix
+from utils.ft import get_IDFT_matrix, fd2td
 from networks.gas_net import GasNetwork
 from gurobipy import Model, GRB, quicksum
 from read.read_instance import read_instance
 from networks.heating_net import HeatingNetwork
 from networks.electricity_net import ElectricityNetwork
+from scipy import sparse
 
 
 class OptimalEnergyFlowUsingUEC:
