@@ -118,7 +118,7 @@ class Comparer:
         for i, result in enumerate(self.results):
             self.diff_op_costs[i] = result.optimal_cost - main_op_cost
         
-    def visualize_comparison(self,):
+    def visualize_comparison(self, save_path: str = None):
         compare_to = 0
         axes = []
         fig = plt.figure(tight_layout=True, figsize=(10, 12), dpi=80)
@@ -152,7 +152,7 @@ class Comparer:
         ax3 = fig.add_subplot(gs[1, 0])
         axes.append(ax3)
         ax3.set_title("Gas - production and consumption")
-        ax3.set_ylabel("Gas [kg/h]")
+        ax3.set_ylabel("Gas [kg/s]")
         for i, gw in enumerate(self.diff_gas[compare_to]["gas production"].keys()):
             ax3.plot(
                 ts, self.diff_gas[compare_to]["gas production"][gw], label=f"gaswell {i+1}"
@@ -188,11 +188,14 @@ class Comparer:
         ax6 = fig.add_subplot(gs[2, 1])
         axes.append(ax6)
         ax6.set_title("Heat - node temperature")
-        ax6.set_ylabel("Temperature [C]")
+        ax6.set_ylabel("Temperature [$\degree$C]")
         for key, value in self.diff_heat[compare_to]["node temperatures"].items():
             ax6.plot(ts, value, label=key)
         ax6.legend()
-        
+
+        if save_path:
+            plt.savefig(save_path)
+            
         fig.show()
     
     def summary(self,) -> List[str]:
