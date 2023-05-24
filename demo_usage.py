@@ -8,7 +8,7 @@ from visualize.ies_plot import plot_ies_excitations_and_responses
 from results import Result, Comparer
 
 if __name__ == '__main__':
-    mpl.use("TkAgg")
+    #mpl.use("TkAgg")
 
     # do arguments parse
     parser = argparse.ArgumentParser()
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         "--cut_off", "-c",
         type=int,
         help="cutoff value for frequency",
-        default=None
+        default=50
     )
     parser.add_argument(
         "--maxiter", "-m",
