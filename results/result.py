@@ -101,7 +101,7 @@ class Result:
 
         # heat network (MW)
         h_CHP, h_gCHP, h_pump, h_boiler = ies.get_heat_production()
-        heat_load = ies.g_net.get_total_load()
+        heat_load = ies.h_net.get_total_load()
         node_temperature = ies.h_net.get_node_temperature_curves()
         node_temperatures = {
             nd_id + 1: node_temperature[nd_id]
