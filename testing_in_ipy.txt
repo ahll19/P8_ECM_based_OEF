@@ -1,0 +1,34 @@
+# legacy
+
+# Ready commands for running cut_off test
+execute_string = "/home/anders/Git/P8_ECM_based_OEF/venv/bin/python3"
+
+i_file = "-f 'instance/small case/IES_E9H12G7-v1.xlsx'"
+cut_offs = [i for i in range(1, 95)]
+
+args = [
+    (i_file + " -c " + str(c))
+    for c in cut_offs
+]
+
+execute_statements = [
+    execute_string + " demo_usage.py " + arg
+    for arg in args
+]
+execute_statements.append("/home/anders/Git/P8_ECM_based_OEF/venv/bin/python3 -f 'instance/small case/IES_E9H12G7-v1.xlsx'")
+
+# Run the cut_off test
+import time
+l = len(execute_statements)
+times = []
+for i in trange(0, l):
+    start = time.time()
+    system(execute_statements[i])
+    end = time.time()
+    times.append(end - start)
+
+from results import Result
+import matplotlib.pyplot as plt
+from os import system, listdir
+import numpy as np
+from tqdm.notebook import trange
